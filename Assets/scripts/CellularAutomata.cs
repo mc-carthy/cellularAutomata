@@ -8,7 +8,7 @@ public class CellularAutomata : MonoBehaviour {
     public bool useRandomSeed;
     public int width;
     public int height;
-    [RangeAttribute (1, 10)]
+    [RangeAttribute (0, 10)]
     public int borderSize;
     [RangeAttribute (0, 100)]
     public int randomFillPercent;
@@ -174,6 +174,7 @@ public class CellularAutomata : MonoBehaviour {
         }
 
         List<List<Coord>> roomRegions = GetRegions (0);
+        List<Room> survivingRooms = new List<Room> ();
         
         // Remove wall regions smaller than  wallThresholdSize
         foreach (List<Coord> roomRegion in roomRegions)
@@ -185,7 +186,81 @@ public class CellularAutomata : MonoBehaviour {
                     map [tile.tileX, tile.tileY] = 1;
                 }
             }
+            else
+            {
+                survivingRooms.Add (new Room (roomRegion, map));
+            }
         }
+
+        ConnectClosestRooms (survivingRooms);
+    }
+
+    private void ConnectClosestRooms (List<Room> allRooms)
+    {
+        int bestDistance = 0;
+        Coord bestTileA = new Coord ();
+        Coord bestTileB = new Coord ();
+        Room bestRoomA = new Room ();
+        Room bestRoomB = new Room ();
+        bool possibleConnectionFound = false;
+
+        foreach (Room roomA in allRooms)
+        {
+            possibleConnectionFound = false;
+
+            foreach (Room roomB in allRooms)
+            {
+                if (roomA == roomB)
+                {
+                    continue;
+                }
+
+                if (roomA.IsConnected (roomB))
+                {
+                    possibleConnectionFound = false;
+                    break;
+                }
+
+                for (int tileIndexA = 0; tileIndexA < roomA.edgeTiles.Count; tileIndexA++)
+                {
+                    for (int tileIndexB = 0; tileIndexB < roomB.edgeTiles.Count; tileIndexB++)
+                    {
+                        Coord tileA = roomA.edgeTiles [tileIndexA];
+                        Coord tileB = roomB.edgeTiles [tileIndexB];
+
+                        int distanceBetweenRooms = (int) (Mathf.Pow(tileA.tileX - tileB.tileX, 2) + Mathf.Pow (tileA.tileY - tileB.tileY, 2));
+
+                        if (distanceBetweenRooms < bestDistance || !possibleConnectionFound)
+                        {
+                            bestDistance = distanceBetweenRooms;
+                            possibleConnectionFound = true;
+                            bestTileA = tileA;
+                            bestTileB = tileB;
+                            bestRoomA = roomA;
+                            bestRoomB = roomB;
+                        }
+                    }
+                }
+            }
+
+            if (possibleConnectionFound)
+            {
+                CreatePassage (bestRoomA, bestRoomB, bestTileA, bestTileB);
+            }
+
+        }
+    }
+
+    private void CreatePassage (Room roomA, Room roomB, Coord tileA, Coord tileB)
+    {
+        Room.ConnectRooms (roomA, roomB);
+
+        Debug.DrawLine (CoordToWorldPoint (tileA), CoordToWorldPoint (tileB), Color.green, 100f);
+    }
+
+    private Vector3 CoordToWorldPoint (Coord tile)
+    {
+        return new Vector3 (-width / 2f + 0.5f + tile.tileX, 2f, -height / 2f + 0.5f + tile.tileY);
     }
 
 
@@ -227,7 +302,7 @@ public class CellularAutomata : MonoBehaviour {
                 else
                 {
                     // Encourage walls around edge of map
-                    wallCount++;
+                    wallCount += 2;
                 }
             }   
         }
@@ -248,6 +323,54 @@ public class CellularAutomata : MonoBehaviour {
         {
             tileX = x;
             tileY = y;
+        }
+    }
+
+    class Room {
+        public List<Coord> tiles;
+        public List<Coord> edgeTiles;
+        public List<Room> connectedRooms;
+        public int roomSize;
+
+        public Room ()
+        {
+
+        }
+
+        public Room (List<Coord> roomTiles, int [,] map)
+        {
+            tiles = roomTiles;
+            roomSize = tiles.Count;
+            connectedRooms = new List<Room> ();
+            edgeTiles = new List<Coord> ();
+
+            foreach (Coord tile in tiles)
+            {
+                for (int x = tile.tileX - 1; x <= tile.tileX + 1; x++)
+                {
+                    for (int y = tile.tileY - 1; y <= tile.tileY + 1; y++)
+                    {
+                        if (x == tile.tileX || y == tile.tileY)
+                        {
+                            if (map [x, y] == 1)
+                            {
+                                edgeTiles.Add (tile);
+                            }
+                        }
+                    }    
+                }
+            }
+        }
+
+        public static void ConnectRooms (Room roomA, Room roomB)
+        {
+            roomA.connectedRooms.Add (roomB);
+            roomB.connectedRooms.Add (roomA);
+        }
+
+        public bool IsConnected (Room otherRoom)
+        {
+            return connectedRooms.Contains (otherRoom);
         }
     }
 

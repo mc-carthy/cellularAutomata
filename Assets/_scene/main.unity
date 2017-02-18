@@ -140,7 +140,7 @@ MonoBehaviour:
   width: 128
   height: 64
   borderSize: 5
-  randomFillPercent: 50
+  randomFillPercent: 55
   smoothingIterations: 5
   wallThresholdSize: 20
   roomThresholdSize: 50
