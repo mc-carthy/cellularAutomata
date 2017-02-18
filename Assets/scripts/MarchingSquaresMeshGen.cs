@@ -136,13 +136,14 @@ public class MarchingSquaresMeshGen : MonoBehaviour {
         mesh.triangles = triangles.ToArray ();
         mesh.RecalculateNormals ();
 
-        if (!is2D)
+        if (is2D)
         {
-            CreateWallMesh ();
+            cave.gameObject.transform.rotation = Quaternion.Euler (270f, 0f, 0f);
+            Generate2DColliders ();
         }
         else
         {
-            cave.gameObject.transform.rotation = Quaternion.Euler (270f, 0f, 0f);
+            CreateWallMesh ();
         }
 
 
@@ -206,6 +207,31 @@ public class MarchingSquaresMeshGen : MonoBehaviour {
 
         MeshCollider wallCollider = walls.gameObject.AddComponent<MeshCollider> ();
         wallCollider.sharedMesh = wallMesh;
+    }
+
+    private void Generate2DColliders ()
+    {
+        EdgeCollider2D[] currentColliders = gameObject.GetComponents<EdgeCollider2D> ();
+
+        for (int i = 0; i < currentColliders.Length; i++)
+        {
+            Destroy (currentColliders [i]);
+        }
+
+        CalculateMeshOutlines ();
+
+        foreach (List<int> outline in outlines)
+        {
+            EdgeCollider2D edgeCol = gameObject.AddComponent<EdgeCollider2D> ();
+            Vector2[] edgePoints = new Vector2[outline.Count];
+
+            for (int i = 0; i < outline.Count; i++)
+            {
+                edgePoints [i] = new Vector2 (vertices [outline [i]].x, vertices [outline [i]].z);
+            }
+
+            edgeCol.points = edgePoints;
+        }
     }
 
     private void TriangulateSquare (Square square)
