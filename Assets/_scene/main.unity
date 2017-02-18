@@ -139,7 +139,7 @@ MonoBehaviour:
   useRandomSeed: 0
   width: 128
   height: 64
-  borderSize: 5
+  borderSize: 0
   randomFillPercent: 55
   smoothingIterations: 5
   wallThresholdSize: 20

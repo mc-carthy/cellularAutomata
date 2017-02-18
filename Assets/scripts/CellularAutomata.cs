@@ -280,6 +280,11 @@ public class CellularAutomata : MonoBehaviour {
                 {
                     map [x, y] = 0;
                 }
+
+                if (x < 2 || x > width - 2 || y < 2 || y > height - 2)
+                {
+                    map [x, y] = 1;
+                }
             }
         }   
     }
@@ -302,7 +307,7 @@ public class CellularAutomata : MonoBehaviour {
                 else
                 {
                     // Encourage walls around edge of map
-                    wallCount += 2;
+                    wallCount++;
                 }
             }   
         }
