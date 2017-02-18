@@ -7,6 +7,7 @@ public class CellularAutomata : MonoBehaviour {
     public bool useRandomSeed;
     public int width;
     public int height;
+    [RangeAttribute (1, 10)]
     public int borderSize;
     [RangeAttribute (0, 100)]
     public int randomFillPercent;
@@ -17,7 +18,6 @@ public class CellularAutomata : MonoBehaviour {
     private void Start ()
     {
         GenerateMap ();
-        CentreMap ();
     }
 
     private void Update ()
