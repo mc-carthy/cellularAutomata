@@ -296,7 +296,7 @@ public class CellularAutomata : MonoBehaviour {
     {
         Room.ConnectRooms (roomA, roomB);
 
-        Debug.DrawLine (CoordToWorldPoint (tileA), CoordToWorldPoint (tileB), Color.green, 100f);
+        Debug.DrawLine (CoordToWorldPoint (tileA), CoordToWorldPoint (tileB), Color.green, 3f);
 
         List<Coord> line = GetLine (tileA, tileB);
 

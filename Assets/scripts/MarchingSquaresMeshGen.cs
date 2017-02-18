@@ -96,6 +96,8 @@ public class MarchingSquaresMeshGen : MonoBehaviour {
         }
     }
 
+    public bool is2D;
+
     public SquareGrid squareGrid;
     private List<Vector3> vertices;
     private List<int> triangles;
@@ -105,6 +107,7 @@ public class MarchingSquaresMeshGen : MonoBehaviour {
     private HashSet<int> checkedVertices = new HashSet<int> ();
 
     public MeshFilter walls;
+    public MeshFilter cave;
 
     public void GenerateMesh (int [,] map, float squareSize)
     {
@@ -127,13 +130,21 @@ public class MarchingSquaresMeshGen : MonoBehaviour {
         }
 
         Mesh mesh = new Mesh ();
-        GetComponent<MeshFilter> ().mesh = mesh;
+        cave.mesh = mesh;
 
         mesh.vertices = vertices.ToArray ();
         mesh.triangles = triangles.ToArray ();
         mesh.RecalculateNormals ();
 
-        CreateWallMesh ();
+        if (!is2D)
+        {
+            CreateWallMesh ();
+        }
+        else
+        {
+            cave.gameObject.transform.rotation = Quaternion.Euler (270f, 0f, 0f);
+        }
+
 
     }
 
@@ -192,6 +203,9 @@ public class MarchingSquaresMeshGen : MonoBehaviour {
         wallMesh.triangles = wallTriangles.ToArray ();
 
         walls.mesh = wallMesh;
+
+        MeshCollider wallCollider = walls.gameObject.AddComponent<MeshCollider> ();
+        wallCollider.sharedMesh = wallMesh;
     }
 
     private void TriangulateSquare (Square square)
