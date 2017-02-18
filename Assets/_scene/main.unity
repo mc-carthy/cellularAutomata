@@ -135,13 +135,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 135140435356a4a9d81532ce06704e50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 
-  useRandomSeed: 1
+  seed: 0
+  useRandomSeed: 0
   width: 128
   height: 64
   borderSize: 5
-  randomFillPercent: 45
+  randomFillPercent: 50
   smoothingIterations: 5
+  wallThresholdSize: 20
+  roomThresholdSize: 50
 --- !u!114 &711729965
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,7 +254,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 50
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
