@@ -16,6 +16,7 @@ public class CellularAutomata : MonoBehaviour {
     public int smoothingIterations;
     public int wallThresholdSize;
     public int roomThresholdSize;
+    public int passageRadius;
 
 	private int [,] map;
 
@@ -296,6 +297,91 @@ public class CellularAutomata : MonoBehaviour {
         Room.ConnectRooms (roomA, roomB);
 
         Debug.DrawLine (CoordToWorldPoint (tileA), CoordToWorldPoint (tileB), Color.green, 100f);
+
+        List<Coord> line = GetLine (tileA, tileB);
+
+        foreach (Coord c in line)
+        {
+            DrawCircle (c, passageRadius);
+        }
+    }
+
+    private void DrawCircle (Coord c, int radius)
+    {
+        for (int x = -radius; x <= radius; x++)
+        {
+            for (int y = -radius; y <= radius; y++)
+            {
+                if (x * x + y * y <= radius * radius)
+                {
+                    int drawX = c.tileX + x;
+                    int drawY = c.tileY + y;
+
+                    if (IsInMapRange (drawX, drawY))
+                    {
+                        map [drawX, drawY] = 0;
+                    }
+                }
+            }   
+        }
+    }
+
+    private List<Coord> GetLine (Coord from, Coord to)
+    {
+        List<Coord> line = new List<Coord> ();
+
+        int x = from.tileX;
+        int y = from.tileY;
+
+        int dx = to.tileX - from.tileX;
+        int dy = to.tileY - from.tileY;
+
+        bool inverted = false;
+
+        int step = Math.Sign (dx);
+        int gradientStep = Math.Sign (dy);
+
+        int longest = Math.Abs (dx);
+        int shortest = Math.Abs (dy);
+
+        if (longest < shortest)
+        {
+            inverted = true;
+            longest = Math.Abs (dy);
+            shortest = Math.Abs (dx);
+
+            step = Math.Sign (dy);
+            gradientStep = Math.Sign (dx);
+        }
+
+        int gradientAccumulation = longest / 2;
+
+        for (int i = 0; i < longest; i++)
+        {
+            line.Add (new Coord (x, y));
+            if (inverted) {
+                y += step;
+            }
+            else
+            {
+                x += step;
+            }
+            gradientAccumulation += shortest;
+
+            if (gradientAccumulation >= longest)
+            {
+                if (inverted) {
+                    x += gradientStep;
+                }
+                else
+                {
+                    y += gradientStep;
+                }
+                gradientAccumulation -= longest;
+            }
+        }
+
+        return line;
     }
 
     private Vector3 CoordToWorldPoint (Coord tile)
