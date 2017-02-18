@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
-using System;
 
+[RequireComponent (typeof (MarchingSquaresMeshGen))]
 public class CellularAutomata : MonoBehaviour {
 
     public string seed;
     public bool useRandomSeed;
     public int width;
     public int height;
+    public int borderSize;
     [RangeAttribute (0, 100)]
     public int randomFillPercent;
     public int smoothingIterations;
@@ -37,8 +38,26 @@ public class CellularAutomata : MonoBehaviour {
             SmoothMap ();
         }
 
+        int [,] borderedMap = new int [width + borderSize * 2, height + borderSize * 2];
+
+        for (int x = 0; x < borderedMap.GetLength (0); x++)
+        {
+            for (int y = 0; y < borderedMap.GetLength (1); y++)
+            {
+                if (x >= borderSize && x < width + borderSize && y >= borderSize && y < height + borderSize)
+                {
+                    borderedMap [x, y] = map [x - borderSize, y - borderSize];
+                }
+                else
+                {
+                    borderedMap [x, y] = 1;
+                }
+            }   
+        }
+        
+
         MarchingSquaresMeshGen meshGen = GetComponent<MarchingSquaresMeshGen> ();
-        meshGen.GenerateMesh (map, 1f);
+        meshGen.GenerateMesh (borderedMap, 1f);
     }
 
     private void CentreMap ()
