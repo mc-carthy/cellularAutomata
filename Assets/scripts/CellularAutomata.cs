@@ -19,6 +19,7 @@ public class CellularAutomata : MonoBehaviour {
     public int passageRadius;
 
 	private int [,] map;
+    private int [,] distanceFromWall;
 
     private void Start ()
     {
@@ -163,7 +164,7 @@ public class CellularAutomata : MonoBehaviour {
     {
         List<List<Coord>> wallRegions = GetRegions (1);
         
-        // Remove wall regions smaller than  wallThresholdSize
+        // Remove wall regions smaller than wallThresholdSize
         foreach (List<Coord> wallRegion in wallRegions)
         {
             if (wallRegion.Count < wallThresholdSize)
@@ -178,7 +179,7 @@ public class CellularAutomata : MonoBehaviour {
         List<List<Coord>> roomRegions = GetRegions (0);
         List<Room> survivingRooms = new List<Room> ();
         
-        // Remove wall regions smaller than  wallThresholdSize
+        // Remove wall regions smaller than roomThresholdSize
         foreach (List<Coord> roomRegion in roomRegions)
         {
             if (roomRegion.Count < roomThresholdSize)
@@ -392,6 +393,7 @@ public class CellularAutomata : MonoBehaviour {
 
     private void SmoothMap ()
     {
+        int [,] newMap = new int [width, height];
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -400,19 +402,20 @@ public class CellularAutomata : MonoBehaviour {
 
                 if (neighbourWallTiles > 4)
                 {
-                    map [x, y] = 1;
+                    newMap [x, y] = 1;
                 }
                 else if (neighbourWallTiles < 4)
                 {
-                    map [x, y] = 0;
+                    newMap [x, y] = 0;
                 }
 
                 if (x < 2 || x > width - 2 || y < 2 || y > height - 2)
                 {
-                    map [x, y] = 1;
+                    newMap [x, y] = 1;
                 }
             }
-        }   
+        }
+        map = newMap;
     }
 
     private int GetSurroundingWallCount (int gridX, int gridY)
