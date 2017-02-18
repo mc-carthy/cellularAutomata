@@ -136,6 +136,19 @@ public class MarchingSquaresMeshGen : MonoBehaviour {
         mesh.triangles = triangles.ToArray ();
         mesh.RecalculateNormals ();
 
+        int tileSize = 10;
+        Vector2[] uvs = new Vector2[vertices.Count];
+
+        for (int i = 0; i < vertices.Count; i++)
+        {
+            float percentX = Mathf.InverseLerp (-map.GetLength (0) / 2f * squareSize, map.GetLength (0) / 2f * squareSize, vertices [i].x) * tileSize;
+            float percentY = Mathf.InverseLerp (-map.GetLength (0) / 2f * squareSize, map.GetLength (0) / 2f * squareSize, vertices [i].z) * tileSize;
+
+            uvs [i] = new Vector2 (percentX, percentY);
+        }
+
+        mesh.uv = uvs;
+
         if (is2D)
         {
             cave.gameObject.transform.rotation = Quaternion.Euler (270f, 0f, 0f);
