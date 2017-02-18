@@ -218,7 +218,13 @@ public class MarchingSquaresMeshGen : MonoBehaviour {
 
         walls.mesh = wallMesh;
 
-        MeshCollider wallCollider = walls.gameObject.AddComponent<MeshCollider> ();
+        MeshCollider wallCollider = walls.gameObject.GetComponent<MeshCollider> ();
+
+        if (wallCollider == null)
+        {
+            wallCollider = walls.gameObject.AddComponent<MeshCollider> ();
+        }
+        
         wallCollider.sharedMesh = wallMesh;
     }
 
