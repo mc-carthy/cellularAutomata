@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
 public class BSPTree : MonoBehaviour {
@@ -12,13 +13,20 @@ public class BSPTree : MonoBehaviour {
     private void Start ()
     {
         CreateRooms ();
-        // InitialiseGrid ();
-        // CentreGrid ();
+        GameObject.Find ("debugQuads").gameObject.SetActive (false);
+    }
+
+    private void Update ()
+    {
+        if (Input.GetKeyDown (KeyCode.Space))
+        {
+            SceneManager.LoadScene (SceneManager.GetActiveScene ().name, LoadSceneMode.Single);
+        }
     }
 
     private void CreateRooms ()
     {
-        root = new BSPLeaf (0, 0, (int) treeSize.x, (int) treeSize.y);
+        root = new BSPLeaf (0, 0, (int) treeSize.x, (int) treeSize.y, null);
         leaves.Add (root);
 
         bool didSplit = true;
@@ -44,6 +52,11 @@ public class BSPTree : MonoBehaviour {
         }
 
         root.CreateRooms ();
+        GameObject baseQuad = GameObject.CreatePrimitive (PrimitiveType.Quad);
+        baseQuad.transform.position = new Vector3 (treeSize.x / 2f, -2f, treeSize.y / 2f);
+        baseQuad.transform.localScale = new Vector3 (treeSize.x, treeSize.y, 0f);
+        baseQuad.transform.Rotate (new Vector3 (90f, 0f, 0f));
+        baseQuad.GetComponent<Renderer> ().material.color = Color.black;
     }
 
 }
